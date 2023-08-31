@@ -4,337 +4,64 @@ titleTemplate: '%s'
 favicon: favicon.png
 class: text-center
 background: /title.jpeg
-title: The hashing dilemma,<br>Rollup 3,<br>and our future with Vite
+title: Reinventing Rollup
 aspectRatio: "16/10"
 ---
 
-# The hashing dilemma,<br>Rollup 3,<br>and our future with Vite
+# Reinventing Rollup
 
 Dr. Lukas Taegert-Atkinson<br>
 TNG Technology Consulting
 
 Maintainer of RollupJS
 
-<!--
-Thank you very much for giving me the oppourtunity to talk here.
-
-Fair to say Rollup is one of the foundations on which Vite is built.
-
-When I was invited, at least one person expected me to shed a little more light our relationship.
--->
-
----
-layout: tweet-right
-tweet: '1563159067979161601'
-background: title.jpeg
----
-
-<div v-click>
-
-# Will talk about Vite/Rollup cooperation later
-
-but first…
-
-</div>
-
-<!--
-So Eric, I will try to do that.
-
-But first something else, as what really gets me going is technical stuff. But bear with me, it will be very relevant to the topic.
--->
-
----
-layout: cover
-background: /ancient-bug.jpeg
----
-
-# An ancient Rollup bug
-
 ---
 layout: image
 background: ancient-bug.jpeg
 ---
 
-<img src="/chunk-hash-bug.png" alt="Rollup hashing bug report" w="700px" rounded="xl">
+# Past endeavors
 
----
-layout: tweet-right
-tweet: '1277937776898519040'
-background: ancient-bug.jpeg
----
-
-<div v-click>
-
-# Uh oh
-
-</div>
-
-<!--
-A well-known Google developer advocate was really making a great case how Rollup's plugin system was so much superior to the alternatives.
--->
+Important milestones since ViteConf 22
 
 ---
 layout: small-image-right
 image: ancient-bug.jpeg
+clicks: 3
 ---
 
-# Content-based file names
+## Features for plugin authors
 
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
+<v-clicks class="click-fade" at="-1">
 
-A("<b>chunk-16d093.js</b><br><pre>
-import('./chunk-b509f6.js');
-import('./chunk-14d9c9.js');</pre>")
-B("<b>chunk-b509f6.js</b><br><pre>
-console.log('foo');</pre>")
-C("<b>chunk-14d9c9.js</b><br><pre>
-console.log('bar');</pre>")
-A --> B
-A --> C
-```
-
-<!--
-file names should be unique identifiers for their content.
--->
-
----
-clicks: 2
-layout: small-image-right
-image: ancient-bug.jpeg
----
-
-# Content-based file names
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-<span style=color:red>c7e614</span>.js</b><br><pre>
-import('./chunk-<span style=color:red>b89eaa</span>.js');
-import('./chunk-14d9c9.js');</pre>")
-B("<b>chunk-<span style=color:red>b89eaa</span>.js</b><br><pre>
-console.log('<span style=color:red>baz</span>');</pre>")
-C("<b>chunk-14d9c9.js</b><br><pre>
-console.log('bar');</pre>")
-A --> B
-A --> C
-```
-
-<v-clicks at="1" class="click-fade" v-click="1">
-
-- long-term client-side caching
-- deployments at any time<br>
-  → take unchanged files from cache
-
-</v-clicks>
-
----
-clicks: 1
-layout: small-image-right
-image: ancient-bug.jpeg
----
-
-# Problem: Circular references
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-?.js</b><br><pre>
-console.log('foo');
-import('./chunk-?.js');</pre>")
-B("<b>chunk-?.js</b><br><pre>
-console.log('bar');
-import('./chunk-?.js');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="1" class="click-fade" v-click="1">
-
-1. Start with per-file hashes that do not include other hashes<br>
-   <span v-click="2">→ Rollup 2: Hash with original import targets</span>
-2. Combine "hash dependencies" to final hash
-3. Replace hashes<br>
-   → Rollup 2: Replace imports with chunk names
-
-</v-clicks>
-
-<!--
-How do you hash in such a scenario? Now we want to hash a content that references another file that references the original file.
--->
-
----
-clicks: 0
-layout: small-image-right
-image: ancient-bug.jpeg
----
-
-# Problem: Circular references
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-?.js</b><br>hash: 🍎<pre>
-console.log('foo');
-import('<span style=color:red>./bar.js</span>');</pre>")
-B("<b>chunk-?.js</b><br>hash: 🥦<pre>
-console.log('bar');
-import('<span style=color:red>./foo.js</span>');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="0" class="click-fade">
-
-1. Start with per-file hashes that do not include other hashes<br>
-   → Rollup 2: Hash with original import targets
-2. Combine "hash dependencies" to final hash
-3. Replace hashes<br>
-   → Rollup 2: Replace imports with chunk names
-
-</v-clicks>
-
----
-clicks: 0
-layout: small-image-right
-image: ancient-bug.jpeg
----
-
-# Problem: Circular references
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-🐠.js</b><br>hash: 🍎<br>depends on: 🍎 + 🥦 = 🐠<pre>
-console.log('foo');
-import('<span style=color:red>./bar.js</span>');</pre>")
-B("<b>chunk-🦑.js</b><br>hash: 🥦<br>depends on: 🥦 + 🍎 = 🦑<pre>
-console.log('bar');
-import('<span style=color:red>./foo.js</span>');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="-1" class="click-fade">
-
-1. Start with per-file hashes that do not include other hashes<br>
-   → Rollup 2: Hash with original import targets
-2. Combine "hash dependencies" to final hash
-3. Replace hashes<br>
-   → Rollup 2: Replace imports with chunk names
-
-</v-clicks>
-
----
-clicks: 0
-layout: small-image-right
-image: ancient-bug.jpeg
----
-
-# Problem: Circular references
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-🐠.js</b><br>hash: 🍎<br>depends on: 🍎 + 🥦 = 🐠<pre>
-console.log('foo');
-import('<span style=color:blue>./chunk-🦑.js</span>');</pre>")
-B("<b>chunk-🦑.js</b><br>hash: 🥦<br>depends on: 🥦 + 🍎 = 🦑 <pre>
-console.log('bar');
-import('<span style=color:blue>./chunk-🐠.js</span>');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="-2" class="click-fade">
-
-1. Start with per-file hashes that do not include other hashes<br>
-   → Rollup 2: Hash with original import targets
-2. Combine "hash dependencies" to final hash
-3. Replace hashes<br>
-   → Rollup 2: Replace imports with chunk names
+* Tree-shaking for emitted assets:<br>
+  `this.emitFile()` with `needsCodeReference: true`
+* Support for `"prebuilt-chunk"` emission in `this.emitFile()`
+* `resolvedBy` field in `this.resolve()` response for easier debugging
+* New logging API
+  - `this.debug()` (hidden by default) and `this.info()` (shown by default)
+  - React to and filter logs via `onLog` hook
 
 </v-clicks>
 
 ---
 layout: small-image-right
 image: ancient-bug.jpeg
-clicks: 0
+clicks: 5
 ---
 
-# Problem: Circular references
+## Features for end users
 
-<div style="height: 170px">
+<v-clicks class="click-fade" at="-1">
 
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-🐠.js</b><br>hash: 🍎<br>depends on: 🍎 + 🥦 = 🐠<pre>
-console.log('foo');
-import('<span style=color:blue>./chunk-🦑.js</span>');</pre>")
-B("<b>chunk-🦑.js</b><br>hash: 🥦<br>depends on: 🥦 + 🍎 = 🦑<pre>
-console.log('<span style=color:red>changed</span>');
-import('<span style=color:blue>./chunk-🐠.js</span>');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="-3" class="click-fade">
-
-1. Start with per-file hashes that do not include other hashes<br>
-   → Rollup 2: Hash with original import targets
-2. Combine "hash dependencies" to final hash
-3. Replace hashes<br>
-   → Rollup 2: Replace imports with chunk names
-4. 🚨 Run `renderChunk` plugin hook for chunk transformations
+* Much faster code-splitting algorithm
+* Named export tree-shaking for dynamic imports
+* `__NO_SIDE_EFFECTS__` annotation for function declarations
+* `experimentalMinChunkSize` option
+  * Works, but results not 100% satisfactory
+  * Heavily relies on side-effect-free code → motivated new features
+* `experimentalLogSideEffects` to find out what Rollup considers as side effects
+* `treeshake.manualPureFunctions` to eliminate side effects manually
 
 </v-clicks>
 
@@ -343,492 +70,274 @@ layout: small-image-right
 image: ancient-bug.jpeg
 ---
 
-## Nice
-easy to implement, handles cycles
+Solid improvements, but not a quantum leap.
 
 <v-click>
 
-## Oops
-hashes depend on original file names
+### Major complaints
 
-</v-click>
-<v-click>
-
-
-## Arrgh
-**chunk transformations by plugins cannot change hashes**
-
-→ Rollup's `renderChunk` hook breaks content hashing
+* Bundling speed
+* Memory consumption
 
 </v-click>
 
 ---
-layout: cover
-background: /solving-the-hashing-dilemma.jpeg
+layout: image
+background: title.jpeg
 ---
 
-# Rollup 3:<br>Solving the hashing dilemma
+# Replacing the engine while driving
 
-<!--
-I said that this we will get to Vite as well, but bear a little longer with me. This solution will also provide important improvements to Vite plugins.
--->
-
----
-clicks: 0
-layout: small-image-right
-image: solving-the-hashing-dilemma.jpeg
----
-
-# Rollup 3 hashing
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-?.js</b><pre>
-console.log('foo');
-import('./chunk-?.js');</pre>")
-B("<b>chunk-?.js</b><pre>
-console.log('bar');
-import('./chunk-?.js');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-
----
-clicks: 0
-layout: small-image-right
-image: solving-the-hashing-dilemma.jpeg
----
-
-# Rollup 3 hashing
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-<span style=color:blue>~!{1}~</span>.js</b><pre>
-console.log('foo');
-import('./chunk-<span style=color:blue>~!{2}~</span>.js');</pre>")
-B("<b>chunk-<span style=color:blue>~!{2}~</span>.js</b><pre>
-console.log('bar');
-import('./chunk-<span style=color:blue>~!{1}~</span>.js');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="0" class="click-fade">
-
-1. Replace hashes with placeholders
-2. Transform chunk via `renderChunk`
-3. Search placeholders in output to get hash dependencies
-4. Replace placeholders with default for content hash
-5. Replace placeholders with final hashes
-
-</v-clicks>
-
----
-clicks: 0
-layout: small-image-right
-image: solving-the-hashing-dilemma.jpeg
----
-
-# Rollup 3 hashing
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-<span style=color:blue>~!{1}~</span>.js</b><pre>
-console.log('foo');
-import('./chunk-<span style=color:blue>~!{2}~</span>.js');</pre>")
-B("<b>chunk-<span style=color:blue>~!{2}~</span>.js</b><pre>
-console.log('<span style=color:red>changed</span>');
-import('./chunk-<span style=color:blue>~!{1}~</span>.js');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="-1" class="click-fade">
-
-1. Replace hashes with placeholders
-2. Transform chunk via `renderChunk`
-3. Search placeholders in output to get hash dependencies
-4. Replace placeholders with default for content hash
-5. Replace placeholders with final hashes
-
-</v-clicks>
-
-
----
-clicks: 0
-layout: small-image-right
-image: solving-the-hashing-dilemma.jpeg
----
-
-# Rollup 3 hashing
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-<span style=color:blue>~!{1}~</span>.js</b><br>depends on: <span style=color:blue>~!{1}~</span>, <span style=color:blue>~!{2}~</span><pre>
-console.log('foo');
-import('./chunk-<span style=color:blue>~!{2}~</span>.js');</pre>")
-B("<b>chunk-<span style=color:blue>~!{2}~</span>.js</b><br>depends on: <span style=color:blue>~!{2}~</span>, <span style=color:blue>~!{1}~</span><pre>
-console.log('<span style=color:red>changed</span>');
-import('./chunk-<span style=color:blue>~!{1}~</span>.js');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="-2" class="click-fade">
-
-1. Replace hashes with placeholders
-2. Transform chunk via `renderChunk`
-3. Search placeholders in output to get hash dependencies
-4. Replace placeholders with default for content hash
-5. Replace placeholders with final hashes
-
-</v-clicks>
-
----
-clicks: 0
-layout: small-image-right
-image: solving-the-hashing-dilemma.jpeg
----
-
-# Rollup 3 hashing
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-<span style=color:blue>~!{1}~</span>.js</b><br>hash: 🍎<br>depends on: <span style=color:blue>~!{1}~</span>, <span style=color:blue>~!{2}~</span><pre>
-console.log('foo');
-import('./chunk-<span style=color:red>~!{0}~</span>.js');</pre>")
-B("<b>chunk-<span style=color:blue>~!{2}~</span>.js</b><br>hash: 🫐<br>depends on: <span style=color:blue>~!{2}~</span>, <span style=color:blue>~!{1}~</span><pre>
-console.log('<span style=color:red>changed</span>');
-import('./chunk-<span style=color:red>~!{0}~</span>.js');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="-3" class="click-fade">
-
-1. Replace hashes with placeholders
-2. Transform chunk via `renderChunk`
-3. Search placeholders in output to get hash dependencies
-4. Replace placeholders with default for content hash
-5. Replace placeholders with final hashes
-
-</v-clicks>
-
----
-clicks: 0
-layout: small-image-right
-image: solving-the-hashing-dilemma.jpeg
----
-
-# Rollup 3 hashing
-
-<div style="height: 170px">
-
-```mermaid
-%%{
-  init: {
-    "themeCSS": ".node rect { fill: #fdb; stroke: #000; } .nodeLabel { color: #000; } .node div { text-align: left; line-height: 1.2; padding: 8px; } pre { margin: 16px 0 0 0; }"
-  }
-}%%
-flowchart LR
-
-A("<b>chunk-🍐.js</b><br>hash: 🍎<br>depends on: 🍎 + 🫐 = 🍐<pre>
-console.log('foo');
-import('./chunk-🍊.js');</pre>")
-B("<b>chunk-🍊.js</b><br>hash: 🫐<br>depends on: 🫐 + 🍎 = 🍊<pre>
-console.log('<span style=color:red>changed</span>');
-import('./chunk-🍐.js');</pre>")
-A --> B
-B --> A
-```
-
-</div>
-<v-clicks at="-4" class="click-fade">
-
-1. Replace hashes with placeholders
-2. Transform chunk via `renderChunk`
-3. Search placeholders in output to get hash dependencies
-4. Replace placeholders with default for content hash
-5. Replace placeholders with final hashes
-
-</v-clicks>
+Addressing performance issues<br>without compromising other features
 
 ---
 layout: small-image-right
-image: solving-the-hashing-dilemma.jpeg
+image: ancient-bug.jpeg
 ---
 
-## Yes
-stable hashes that only depend on content
+## Profiling bundling speed
 
-<v-click>
+Rollup browser build as input, no plugins
 
-## Cool
-arbitrary file transformations in `renderChunk` possible
+<v-click class="highlight">
+
+- build: 823ms
+  * generate module graph: 447ms
+    <ul>
+    <li class="highlighted">generate syntax tree (acorn): 180ms</li>
+    <li>analyze syntax tree (Rollup): 262ms</li>
+    </ul>
+  * bind modules: 31ms
+  * tree-shaking: 345ms
+- generate: 79ms
 
 </v-click>
-<v-click>
 
-## Wow
-any chunk reference can be added in `renderChunk`
+---
+layout: small-image-right
+image: ancient-bug.jpeg
+clicks: 6
+---
+
+## Replacing the parser
+
+
+<style>
+.slidev-layout h3 {
+    margin-top: 2rem;
+    margin-bottom: -1rem;
+}
+</style>
+
+### Running SWC from JavaScript
+
+Naïve approach: replace acorn with swc via `@swc/core`.
 
 ```js
-function renderChunk(code, chunk, outputOptions, { /* NEW */ chunks }){
-    // ...
-}
+import { parseSync } from '@swc/core';
+const result = swc.parseSync(code);
 ```
 
-</v-click>
+<p v-click="1">
+Time: 270ms <span v-click="2">(vs. 180ms for acorn!?)</span>
+</p>
 
----
-layout: tweet-right
-tweet: '1565292648134578177'
-background: 'solving-the-hashing-dilemma.jpeg'
----
+<div v-click="3">
 
-<div v-click>
+### Running SWC from Rust
 
-# Makes Vite<br>happy
+Time: 51ms <span v-click="4">→ JSON serialization and deserialization is very costly!</span>
+
+</div>
+
+<div v-click="4">
+
+### More problems:
+
+<p>
+
+<v-clicks class="click-fade" at="4">
+
+- Non-standard AST not easily usable by Rollup
+- AST node positions are UTF-8 offsets vs. UTF-16 in JavaScript
+
+</v-clicks>
+
+</p>
 
 </div>
 
 ---
-layout: cover
-background: /future.jpeg
+layout: small-image-right
+image: ancient-bug.jpeg
+clicks: 3
 ---
 
-# A future with Vite
+## A custom AST serializer
+
+<v-clicks class="click-fade" at="-1">
+
+- Use SWC's parser from Rust
+- Convert AST to custom binary format in Rust
+- While doing this
+  - convert UTF-8 to UTF-16 offsets
+  - make AST ESTree-compatible
+- Directly consume ArrayBuffer in JavaScript
+
+</v-clicks>
 
 ---
-layout: tweet-right
-tweet: '1552627938046222336'
-tweet-click: true
+layout: small-image-right
+image: ancient-bug.jpeg
+---
+
+## Trying it out
+
+Total parse time including conversion: 108ms (vs. 180ms for acorn)
+
+<v-click at="0">
+
+→ Not a quantum leap, but much better!
+
+Breaking down the numbers:
+
+<v-clicks class="click-fade" at="1">
+
+- SWC parse: 51ms
+- Convert to binary: 8ms
+- Convert to AST in JavaScript: 47ms
+
+</v-clicks>
+
+</v-click>
+
+---
+layout: small-image-right
+image: ancient-bug.jpeg
 clicks: 1
-background: 'future.jpeg'
 ---
 
-# How does Rollup<br>feel about<br>Vite?
+## We gained more
 
-<v-click>
+<v-clicks class="click-fade" at="-1">
 
-We were not asked…
-
-</v-click>
-
----
-layout: small-image-right
-image: future.jpeg
-clicks: 3
----
-
-# Why did Vite choose Rollup?
-
-<v-clicks at="1" class="click-fade" v-click="1">
-
-1. Solve the plugin dilemma:<br>No plugins without users, no users without plugins
-2. Slightly smaller output than other options
-3. More mature code-splitting options and configurability than esbuild
-
-</v-clicks>
-<v-click at="3">
-
-Which is exactly how we wanted to position Rollup!
-
-</v-click>
-
-
----
-layout: small-image-right
-image: future.jpeg
-clicks: 3
----
-
-# A personal detour
-
-<v-clicks at="1" class="click-fade" v-click="1">
-
-- Rich Harris created Rollup in 2015
-- In 2017, I created some PRs to improve tree-shaking
-- Accidentally became Rollup maintainer<br><img src="/rich-message.png" class="no-fade">
+- ArrayBuffers can be passed to WebWorkers without copying<br>
+  → trivial to parallelize!
+- ArrayBuffer is about 1/4 the size of the JSON representation<br>
+  → efficient caching with fast deserialization
 
 </v-clicks>
 
 ---
 layout: small-image-right
-image: future.jpeg
+image: ancient-bug.jpeg
 clicks: 4
 ---
 
-# Strategic decisions
+## And this is the start
 
-Problem: No large team, mostly single-time contributors
+We can now grow the native part from there (not part of initial release):
 
-<div v-click="1">
+<v-clicks class="click-fade" at="-1">
 
-Double down on:
-
-<v-clicks at="1" class="click-fade">
-
-- __Core improvements__<br>Do not expand Rollup's scope lightly
-- __No exposed internals__<br>Allow easy refactoring
-- __Configurability__<br>Few assumptions about what Rollup is used for
-- __Plugin interface__<br>as stable, well-documented first-class API
+- Avoid JSON deserialization and directly consume ArrayBuffer
+- Move scope analysis to Rust
+- Offer efficient and fast AST traversal and mutation API to plugins
+- Directly consume/convert TypeScript or JSX
+- Move tree-shaking to Rust...
 
 </v-clicks>
-</div>
 
 ---
 layout: small-image-right
-image: future.jpeg
+image: ancient-bug.jpeg
 clicks: 3
 ---
 
-# Encourage third-party tooling
+## What does it cost us?
 
-for better DX in specific use cases
+<v-clicks class="click-fade" at="-1">
 
-<v-clicks at="1" class="click-fade" v-click="1">
-
-- TSDX, microbundle (library bundling)
-- Stencil (web components)
+- About 2.5 MB additional native code<br>
+  → we only include some parts of SWC
+- We have binaries for the most common platforms and architectures
+- Otherwise, use `@rollup/wasm-node`
+- `@rollup/browser` also includes a `.wasm` file
 
 </v-clicks>
-<v-click at="3">
 
-But WMR and especially Vite were beyond my wildest hopes!
+---
+layout: small-image-right
+image: ancient-bug.jpeg
+---
+
+## Try it out
+
+```
+npm install rollup@beta
+```
+
+unless this is stable by now 😉
+
+---
+layout: small-image-right
+image: ancient-bug.jpeg
+---
+
+## What about Rolldown?
+
+> Fast JavaScript/TypeScript bundler in Rust with Rollup-compatible API
+
+<v-click>
+
+Problem: The rewrite dilemma
+
+> Unless well-staffed and fully committed,<br>a rewrite drains resources from the old project without ever replacing it.
+
+</v-click>
+
+<v-click>
+
+<p style="text-align: center;">
+<strong>I am not opposed to this project!</strong> 
+</p>
+
+If there is a chance that Rolldown
+
+- covers nearly 100% of Rollup
+- with similar output quality
+- in reasonable time
+
+I will switch to that project and make it the next major Rollup version.
 
 </v-click>
 
 ---
+layout: image
+background: title.jpeg
+---
+
+# Future aspirations
+Where could we go with Rollup beyond making it fast?
+
+---
 layout: small-image-right
-image: future.jpeg
+image: ancient-bug.jpeg
 clicks: 2
 ---
 
-# Creating a partnership
+## Some pipe dreams
 
-<v-clicks at="1" class="click-fade" v-click="1">
+<v-clicks class="click-fade" at="-1">
 
-- Include Vite and WMR developers early in plugin API extensions
-- Move some Vite plugin API extensions upstream<br>
-  → "order" attribute for plugin hooks (as a better "enforce")
-
-  <div class="no-fade">
-  
-  __People should be able to write Rollup plugins instead of Vite plugins unless they really need to target Vite__
-
-  </div>
+- Statement level code-splitting<br>
+  Take apart large modules
+- Object property tree-shaking<br>
+  Remove unused object properties
+- Merge chunks and duplicate modules<br>
+  for optimized initial load via custom runtime loader
 
 </v-clicks>
-
----
-layout: cover
-background: /roadmap.jpeg
----
-
-# Roadmap
-
----
-layout: small-image-right
-image: roadmap-narrow.jpeg
----
-
-# More Rollup 3 goodies
-
-- per-chunk `banner/footer/intro/outro`
-- sourcemaps as regular assets in `generateBundle`
-- improved defaults
-- smaller footprint via separate browser build
-
-<a href="https://github.com/rollup/rollup/pull/4549">and more…</a>
-
----
-layout: small-image-right
-image: roadmap-narrow.jpeg
----
-
-# What is next?
-
-<div>
-
-→ Focus on our strengths
-
-</div>
-<v-clicks class="click-fade">
-
-- tree-shaking/code optimization
-- code-splitting<br>→ next up: Minimum chunk size target,<br>merge small side effect free chunks into larger ones
-
-</v-clicks>
-
----
-layout: small-image-right
-image: roadmap-narrow.jpeg
----
-
-# What about build speed?
-
-From Vite docs:
-
-> … That said, we won't rule out the possibility of using esbuild for production builds when it stabilizes these features in the future.
-
-<v-click at="1">
-
-Open to converting Rollup parts to native code eventually
-
-<v-clicks at="2" class="click-fade">
-
-* Probably Rust rather than Go, build on SWC
-* Need new contributors to pull this off
-
-</v-clicks>
-</v-click>
 
 ---
 layout: image
@@ -843,14 +352,8 @@ TNG Technology Consulting
 
 <div>
 
-<a href="https://twitter.com/lukastaegert"><logos-twitter/> @lukastaegert</a>
+<a href="https://m.webtoo.ls/@lukastaegert"><logos-mastodon style="width:60px"/> @lukastaegert@webtoo.ls</a>
 
 <a href="https://rollupjs.org/"><logos-rollup/> rollupjs.org</a>
 
-slides: <a href="https://lukastaegert.github.io/viteconf22-rollup">lukastaegert.github.io/viteconf22-rollup</a>
-
 </div>
-
-<!--
-Thank you for listening, I hope you learned something. Otherwise, maybe I could entertain you with our kid's car collection.
--->

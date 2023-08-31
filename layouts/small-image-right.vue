@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-[650px,1fr] w-full h-full">
+  <div class="grid grid-cols-[650px_1fr] w-full h-full">
     <div class="slidev-layout default">
       <slot />
     </div>

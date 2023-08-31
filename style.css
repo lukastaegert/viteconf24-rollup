@@ -17,3 +17,17 @@
 .click-fade .slidev-vclick-hidden .no-fade {
     opacity: 0;
 }
+
+.highlight .slidev-vclick-hidden {
+    color: rgba(0,0,0,1);
+    opacity: 1!important;
+}
+
+.highlight .slidev-vclick-prior {
+    color: rgba(0,0,0,0.3);
+    opacity: 1!important;
+}
+
+.highlight .slidev-vclick-prior .highlighted {
+    color: rgba(0,0,0,1);
+}
