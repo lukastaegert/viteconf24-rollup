@@ -1,3 +1,7 @@
+blockquote {
+    margin: 0.5rem 0 1rem;
+}
+
 .slidev-layout ul {
     list-style: disc;
 }

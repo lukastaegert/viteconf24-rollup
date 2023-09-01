@@ -3,7 +3,7 @@ theme: default
 titleTemplate: '%s'
 favicon: favicon.png
 class: text-center
-background: /title.jpeg
+background: reinventing-rollup.jpeg
 title: Reinventing Rollup
 aspectRatio: "16/10"
 ---
@@ -17,7 +17,7 @@ Maintainer of RollupJS
 
 ---
 layout: image
-background: ancient-bug.jpeg
+background: past-endeavours.jpeg
 ---
 
 # Past endeavors
@@ -26,33 +26,14 @@ Important milestones since ViteConf 22
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
-clicks: 3
----
-
-## Features for plugin authors
-
-<v-clicks class="click-fade" at="-1">
-
-* Tree-shaking for emitted assets:<br>
-  `this.emitFile()` with `needsCodeReference: true`
-* Support for `"prebuilt-chunk"` emission in `this.emitFile()`
-* `resolvedBy` field in `this.resolve()` response for easier debugging
-* New logging API
-  - `this.debug()` (hidden by default) and `this.info()` (shown by default)
-  - React to and filter logs via `onLog` hook
-
-</v-clicks>
-
----
-layout: small-image-right
-image: ancient-bug.jpeg
-clicks: 5
+image: past-endeavours.jpeg
 ---
 
 ## Features for end users
 
-<v-clicks class="click-fade" at="-1">
+> Try examples in StackBlitz (bottom of window).
+
+<v-clicks class="click-fade">
 
 * Much faster code-splitting algorithm
 * Named export tree-shaking for dynamic imports
@@ -67,23 +48,52 @@ clicks: 5
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: past-endeavours.jpeg
 ---
 
-Solid improvements, but not a quantum leap.
+## Features for plugin authors
+
+> Try examples in StackBlitz (bottom of window).
+
+<v-clicks class="click-fade">
+
+* Tree-shaking for emitted assets:<br>
+  `this.emitFile()` with `needsCodeReference: true`
+* Support for `"prebuilt-chunk"` emission in `this.emitFile()`
+* `resolvedBy` field in `this.resolve()` response for easier debugging
+* New logging API
+  - `this.debug()` (hidden by default) and `this.info()` (shown by default)
+  - React to and filter logs via `onLog` hook
+
+</v-clicks>
+
+---
+layout: small-image-right
+image: past-endeavours.jpeg
+---
+
+<p>
+
+→ Solid improvements, but not a quantum leap.
+
+</p>
 
 <v-click>
 
 ### Major complaints
 
+<p>
+
 * Bundling speed
 * Memory consumption
+
+</p>
 
 </v-click>
 
 ---
 layout: image
-background: title.jpeg
+background: replacing-the-engine-while-driving.jpeg
 ---
 
 # Replacing the engine while driving
@@ -92,7 +102,7 @@ Addressing performance issues<br>without compromising other features
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: replacing-the-engine-while-driving-narrow.jpeg
 ---
 
 ## Profiling bundling speed
@@ -115,7 +125,7 @@ Rollup browser build as input, no plugins
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: replacing-the-engine-while-driving-narrow.jpeg
 clicks: 6
 ---
 
@@ -169,13 +179,12 @@ Time: 51ms <span v-click="4">→ JSON serialization and deserialization is very 
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
-clicks: 3
+image: replacing-the-engine-while-driving-narrow.jpeg
 ---
 
-## A custom AST serializer
+## Can we do better?
 
-<v-clicks class="click-fade" at="-1">
+<v-clicks class="click-fade">
 
 - Use SWC's parser from Rust
 - Convert AST to custom binary format in Rust
@@ -188,7 +197,7 @@ clicks: 3
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: replacing-the-engine-while-driving-narrow.jpeg
 ---
 
 ## Trying it out
@@ -213,7 +222,7 @@ Breaking down the numbers:
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: replacing-the-engine-while-driving-narrow.jpeg
 clicks: 1
 ---
 
@@ -230,13 +239,13 @@ clicks: 1
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: replacing-the-engine-while-driving-narrow.jpeg
 clicks: 4
 ---
 
 ## And this is the start
 
-We can now grow the native part from there (not part of initial release):
+We can now grow the native part from there<br>(not part of initial release):
 
 <v-clicks class="click-fade" at="-1">
 
@@ -250,7 +259,7 @@ We can now grow the native part from there (not part of initial release):
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: replacing-the-engine-while-driving-narrow.jpeg
 clicks: 3
 ---
 
@@ -268,20 +277,24 @@ clicks: 3
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: replacing-the-engine-while-driving-narrow.jpeg
 ---
 
 ## Try it out
+
+<p>
 
 ```
 npm install rollup@beta
 ```
 
+</p>
+
 unless this is stable by now 😉
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: replacing-the-engine-while-driving-narrow.jpeg
 ---
 
 ## What about Rolldown?
@@ -290,7 +303,7 @@ image: ancient-bug.jpeg
 
 <v-click>
 
-Problem: The rewrite dilemma
+### Problem: The rewrite dilemma
 
 > Unless well-staffed and fully committed,<br>a rewrite drains resources from the old project without ever replacing it.
 
@@ -299,7 +312,7 @@ Problem: The rewrite dilemma
 <v-click>
 
 <p style="text-align: center;">
-<strong>I am not opposed to this project!</strong> 
+<strong>I am not opposed to this project!</strong>
 </p>
 
 If there is a chance that Rolldown
@@ -314,7 +327,7 @@ I will switch to that project and make it the next major Rollup version.
 
 ---
 layout: image
-background: title.jpeg
+background: future-aspirations.jpeg
 ---
 
 # Future aspirations
@@ -322,7 +335,7 @@ Where could we go with Rollup beyond making it fast?
 
 ---
 layout: small-image-right
-image: ancient-bug.jpeg
+image: future-aspirations.jpeg
 clicks: 2
 ---
 
@@ -331,9 +344,9 @@ clicks: 2
 <v-clicks class="click-fade" at="-1">
 
 - Statement level code-splitting<br>
-  Take apart large modules
+  → Take apart large modules
 - Object property tree-shaking<br>
-  Remove unused object properties
+  → Remove unused object properties
 - Merge chunks and duplicate modules<br>
   for optimized initial load via custom runtime loader
 
@@ -342,7 +355,7 @@ clicks: 2
 ---
 layout: image
 class: text-center
-background: end.jpeg
+background: reinventing-rollup.jpeg
 ---
 
 # Thank you
@@ -352,7 +365,7 @@ TNG Technology Consulting
 
 <div>
 
-<a href="https://m.webtoo.ls/@lukastaegert"><logos-mastodon style="width:60px"/> @lukastaegert@webtoo.ls</a>
+<a href="https://m.webtoo.ls/@lukastaegert"><logos-mastodon-icon /> @lukastaegert@webtoo.ls</a>
 
 <a href="https://rollupjs.org/"><logos-rollup/> rollupjs.org</a>
 
