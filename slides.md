@@ -4,11 +4,11 @@ titleTemplate: '%s'
 favicon: favicon.png
 class: text-center
 background: reinventing-rollup.jpeg
-title: Reinventing Rollup
+title: The Evolution of Rollup
 aspectRatio: "16/10"
 ---
 
-# Reinventing Rollup
+# The Evolution of Rollup
 
 Dr. Lukas Taegert-Atkinson<br>
 TNG Technology Consulting
@@ -20,337 +20,367 @@ layout: image
 background: past-endeavours.jpeg
 ---
 
-# Past endeavors
+# State of the Rust Migration
 
-Important milestones since ViteConf 22
-
----
-layout: small-image-right
-image: past-endeavours.jpeg
----
-
-## Features for end users
-
-> Try examples in StackBlitz (bottom of window).
-
-<v-clicks class="click-fade">
-
-* Much faster code-splitting algorithm
-* Named export tree-shaking for dynamic imports
-* `__NO_SIDE_EFFECTS__` annotation for function declarations
-* `experimentalMinChunkSize` option
-  * Works, but results not 100% satisfactory
-  * Heavily relies on side-effect-free code → motivated new features
-* `experimentalLogSideEffects` to find out what Rollup considers as side effects
-* `treeshake.manualPureFunctions` to eliminate side effects manually
-
-</v-clicks>
+Improvements since ViteConf 23
 
 ---
 layout: small-image-right
 image: past-endeavours.jpeg
 ---
 
-## Features for plugin authors
-
-> Try examples in StackBlitz (bottom of window).
-
-<v-clicks class="click-fade">
-
-* Tree-shaking for emitted assets:<br>
-  `this.emitFile()` with `needsCodeReference: true`
-* Support for `"prebuilt-chunk"` emission in `this.emitFile()`
-* `resolvedBy` field in `this.resolve()` response for easier debugging
-* New logging API
-  - `this.debug()` (hidden by default) and `this.info()` (shown by default)
-  - React to and filter logs via `onLog` hook
-
-</v-clicks>
-
----
-layout: small-image-right
-image: past-endeavours.jpeg
----
-
-<p>
-
-→ Solid improvements, but not a quantum leap.
-
-</p>
+## What did we achieve so far?
 
 <v-click>
+<div class="statement">20% faster<br>bundling speed</div>
+<div>without plugins, as compared to v3.29.4</div>
+</v-click>
 
-### Major complaints
+<div v-click class="statement">5% reduced memory consumption</div>
+<v-click>
 
-<p>
-
-* Bundling speed
-* Memory consumption
-
-</p>
+<div style="margin-top: 3rem">Biggest improvements are yet to come.</div>
 
 </v-click>
+
+---
+layout: small-image-right
+image: past-endeavours.jpeg
+---
+
+## Next steps
+
+<v-clicks class="click-fade">
+
+* Move cache to binary format
+  * Faster warm start if used
+* New syntax tree parsing and -walking API for plugins
+  * Parsing happens in a different thread
+  * AST nodes are generated lazily
+* Migrate tree-shaking
+  * will take long
+  * impact will be massive
+
+</v-clicks>
 
 ---
 layout: image
-background: replacing-the-engine-while-driving.jpeg
+background: past-endeavours.jpeg
 ---
 
-# Replacing the engine while driving
-
-Addressing performance issues<br>without compromising other features
+# Improved Tree-Shaking
 
 ---
 layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
+image: past-endeavours.jpeg
 ---
 
-## Profiling bundling speed
+## Function argument tracking
 
-Rollup browser build as input, no plugins
-
-<v-click class="highlight">
-
-- build: 823ms
-  * generate module graph: 447ms
-    <ul>
-    <li class="highlighted">generate syntax tree (acorn): 180ms</li>
-    <li>analyze syntax tree (Rollup): 262ms</li>
-    </ul>
-  * bind modules: 31ms
-  * tree-shaking: 345ms
-- generate: 79ms
-
-</v-click>
-
----
-layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
-clicks: 6
----
-
-## Replacing the parser
+<div class="sub-title">for functions only called once</div>
 
 
-<style>
-.slidev-layout h3 {
-    margin-top: 2rem;
-    margin-bottom: -1rem;
+<v-click>
+<div>Input</div>
+
+```javascript
+function query(target, config) {
+  if (config.log) console.log('Hello')
+  return fetch(target);
 }
-</style>
-
-### Running SWC from JavaScript
-
-Naïve approach: replace acorn with swc via `@swc/core`.
-
-```js
-import { parseSync } from '@swc/core';
-const result = swc.parseSync(code);
+query('/api', {log: false});
 ```
 
-<p v-click="1">
-Time: 270ms <span v-click="2">(vs. 180ms for acorn!?)</span>
-</p>
+</v-click>
+<v-click at="2">
 
-<div v-click="3">
+<div style="margin-top: 1rem">Output (Rollup <span v-click.hide="3" style="position:absolute">&lt;</span><span v-click="3">&ge;</span> v4.16.0)</div>
 
-### Running SWC from Rust
-
-Time: 51ms <span v-click="4">→ JSON serialization and deserialization is very costly!</span>
-
-</div>
-
-<div v-click="4">
-
-### More problems:
-
-<p>
-
-<v-clicks class="click-fade" at="4">
-
-- Non-standard AST not easily usable by Rollup
-- AST node positions are UTF-8 offsets vs. UTF-16 in JavaScript
-
-</v-clicks>
-
-</p>
-
-</div>
-
----
-layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
----
-
-## Can we do better?
-
-<v-clicks class="click-fade">
-
-- Use SWC's parser from Rust
-- Convert AST to custom binary format in Rust
-- While doing this
-  - convert UTF-8 to UTF-16 offsets
-  - make AST ESTree-compatible
-- Directly consume ArrayBuffer in JavaScript
-
-</v-clicks>
-
----
-layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
----
-
-## Trying it out
-
-Total parse time including conversion: 108ms (vs. 180ms for acorn)
-
-<v-click at="0">
-
-→ Not a quantum leap, but much better!
-
-Breaking down the numbers:
-
-<v-clicks class="click-fade" at="1">
-
-- SWC parse: 51ms
-- Convert to binary: 8ms
-- Convert to AST in JavaScript: 47ms
-
-</v-clicks>
+````md magic-move{at:3}
+```javascript
+function query(target, config) {
+  if (config.log) console.log('Hello')
+  return fetch(target);
+}
+query('/api', {log: false});
+```
+```javascript
+function query(target, config) {
+  return fetch(target);
+}
+query('/api');
+```
+````
 
 </v-click>
 
 ---
 layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
-clicks: 1
+image: past-endeavours.jpeg
 ---
 
-## We gained more
+## Function argument tracking
 
-<v-clicks class="click-fade" at="-1">
+<div class="sub-title">for functions called multiple times</div>
 
-- ArrayBuffers can be passed to WebWorkers without copying<br>
-  → trivial to parallelize!
-- ArrayBuffer is about 1/4 the size of the JSON representation<br>
-  → efficient caching with fast deserialization
+<div>Input</div>
 
-</v-clicks>
-
----
-layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
-clicks: 4
----
-
-## And this is the start
-
-We can now grow the native part from there<br>(not part of initial release):
-
-<v-clicks class="click-fade" at="-1">
-
-- Avoid JSON deserialization and directly consume ArrayBuffer
-- Move scope analysis to Rust
-- Offer efficient and fast AST traversal and mutation API to plugins
-- Directly consume/convert TypeScript or JSX
-- Move tree-shaking to Rust...
-
-</v-clicks>
-
----
-layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
-clicks: 3
----
-
-## What does it cost us?
-
-<v-clicks class="click-fade" at="-1">
-
-- About 2.5 MB additional native code<br>
-  → we only include some parts of SWC
-- We have binaries for the most common platforms and architectures
-- Otherwise, use `@rollup/wasm-node`
-- `@rollup/browser` also includes a `.wasm` file
-
-</v-clicks>
-
----
-layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
----
-
-## Try it out
-
-<p>
-
+````md magic-move{at:2}
+```javascript
+function query(target, config) {
+  if (config.log) console.log('Hello')
+  return fetch(target);
+}
+query('/api', {log: false});
+query('/api', {log: false});
 ```
-npm install rollup@beta
+```javascript
+function query(target, config) {
+  if (config.log) console.log('Hello')
+  return fetch(target);
+}
+const config = {log: false};
+query('/api', config);
+query('/api', config);
 ```
+```javascript
+function query(target, config) {
+  if (config) console.log('Hello')
+  return fetch(target);
+}
+query('/api', false);
+query('/api', false);
+```
+````
 
-</p>
-
-unless this is stable by now 😉
-
----
-layout: small-image-right
-image: replacing-the-engine-while-driving-narrow.jpeg
----
-
-## What about Rolldown?
-
-> Fast JavaScript/TypeScript bundler in Rust with Rollup-compatible API
-
+<div style="margin-top: 1rem;">
+<span v-click.hide="2" style="position: absolute"><v-click at="1">With inline object values: Not optimized</v-click></span>
+<span v-click.hide="3" style="position: absolute"><v-click at="2">With the same variable: Optimized</v-click></span>
+<span v-click="3">With the same primitive value: Optimized</span>
+</div>
 <v-click>
 
-### Problem: The rewrite dilemma
-
-> Unless well-staffed and fully committed,<br>a rewrite drains resources from the old project without ever replacing it.
+````md magic-move{at:2}
+```javascript
+function query(target, config) {
+  if (config.log) console.log('Hello')
+  return fetch(target);
+}
+query('/api', {log: false});
+query('/api', {log: false});
+```
+```javascript
+function query(target, config) {
+  return fetch(target);
+}
+query('/api');
+query('/api');
+```
+```javascript
+function query(target, config) {
+  return fetch(target);
+}
+query('/api');
+query('/api');
+```
+````
 
 </v-click>
 
+---
+layout: small-image-right
+image: past-endeavours.jpeg
+---
+
+## Tree-shaking for dynamic imports
+
+<div class="sub-title">Property access tracking (in preparation)</div>
+
+<div v-click>
+<div>Input</div>
+
+```javascript{all|3,6-7|1-6}{at:2}
+// main.js
+const module = await import('./dep.js');
+console.log(module.foo);
+
+// dep.js
+export const foo = 'foo';
+export const bar = 'bar';
+```
+
+</div>
+<v-click at="3">
+
+With property access tracking,<br>`bar` will not be included in the bundle.
+
+</v-click>
+<v-click at="4">
+
+But why stop here?
+
+</v-click>
+
+---
+layout: small-image-right
+image: past-endeavours.jpeg
+---
+
+## Tree-shaking for object properties
+
+<div class="sub-title">(in preparation)</div>
+
+<div>Input</div>
+
+```javascript{all|2,4}{at:2}
+function checkOptions(options) {
+  console.log(options.enabled);
+}
+const config = {enabled: true, other: 'ignored'};
+checkOptions(config);
+```
+
 <v-click>
+<div style="margin-top: 1rem">Output with object property tree-shaking</div>
 
-<p style="text-align: center;">
-<strong>I am not opposed to this project!</strong>
-</p>
-
-If there is a chance that Rolldown
-
-- covers nearly 100% of Rollup
-- with similar output quality
-- in reasonable time
-
-I will switch to that project and make it the next major Rollup version.
+```javascript{hide|all|2,4}{at:1}
+function checkOptions(options) {
+  console.log(options.enabled);
+}
+const config = {enabled: true};
+checkOptions(config);
+```
 
 </v-click>
 
 ---
 layout: image
-background: future-aspirations.jpeg
+background: past-endeavours.jpeg
 ---
 
-# Future aspirations
-Where could we go with Rollup beyond making it fast?
+# New Supported Syntax
 
 ---
 layout: small-image-right
-image: future-aspirations.jpeg
-clicks: 2
+image: past-endeavours.jpeg
 ---
 
-## Some pipe dreams
+<div style="margin-bottom: 1rem">Now supported (no transpilation):</div>
+<v-click>
 
-<v-clicks class="click-fade" at="-1">
+## Explicit resource management
 
-- Statement level code-splitting<br>
-  → Take apart large modules
-- Object property tree-shaking<br>
-  → Remove unused object properties
-- Merge chunks and duplicate modules<br>
-  for optimized initial load via custom runtime loader
+<div style="margin: -1rem 0 2rem">
+
+```javascript{all|4,9}{at:2}
+function getResource() {
+  /* allocate resourc here */;
+  return {
+    [Symbol.dispose]() { /* free resource here */ }
+  };
+}
+
+// disposed when out of scope
+using resource = getResource();
+```
+
+</div>
+</v-click>
+
+---
+layout: small-image-right
+image: past-endeavours.jpeg
+---
+
+<div style="margin-bottom: 1rem">Now supported (no transpilation):</div>
+
+## Decorators
+
+<div style="margin: -1rem 0 2rem">
+
+```javascript{all|1,3,7,8,11}
+function logAsync(target, name, descriptor) {
+  const method = descriptor.value;
+  descriptor.value = async function (...args) {
+    const result = await method.apply(this, args);
+    console.log('method complete');
+    return result;
+  }
+}
+
+class Foo {
+  @logAsync
+  async run() {}
+}
+
+new Foo().run();
+```
+
+</div>
+<v-click>
+But there is something else...
+</v-click>
+
+---
+layout: small-image-right
+image: past-endeavours.jpeg
+---
+
+## Experimental JSX Support
+<div class="sub-title">(being finalized)</div>
+
+<div v-click>
+<div>Input</div>
+
+````md magic-move{at:3}
+```javascript
+import React from 'react';
+export const Foo = () => <div key="foo">Hello!</div>;
+```
+```javascript
+export const element = <div key="foo">Hello!</div>;
+```
+````
+
+</div>
+<div style="margin-top: 1rem" v-click="2">
+  <span style="position: absolute" v-click.hide="3"><code>jsx.mode: "classic"</code></span>
+  <span style="position: absolute" v-click.hide="4"><code v-click="3">jsx.mode: "automatic"</code></span>
+  <span><code v-click="4">jsx.mode: "preserve"</code></span>
+
+````md magic-move{at:3}
+```javascript
+import react from 'react';
+const Foo = () =>
+  /*#__PURE__*/react.createElement(div, { key: "foo" }, "Hello!");
+export { Foo };
+```
+```javascript
+import { jsx } from 'react/jsx-runtime';
+const element =
+  /*#__PURE__*/jsx("div", { children: "Hello!" }, "foo");
+export { element };
+```
+```javascript
+export const element = <div key="foo">Hello!</div>;
+```
+````
+
+</div>
+<div v-click="4">with full tree-shaking and deconflicting support.</div>
+
+<h3 v-click="5" style="margin-top: 2rem">Why add support for non-JavaScript syntax?</h3>
+
+<v-clicks at="6" class="click-fade">
+
+* Important use case for libraries
+* No longer possible to extend syntax via plugins
+* Already supported by parser
+* Big performance improvement over plugins
 
 </v-clicks>
+
+<h3 v-click="10" style="margin-top:2rem">☞ We are already looking at TypeScript support</h3>
 
 ---
 layout: image
@@ -369,7 +399,6 @@ TNG Technology Consulting
 
 <a href="https://rollupjs.org/"><logos-rollup/> rollupjs.org</a>
 
-slides: <a href="https://lukastaegert.github.io/viteconf23-rollup">lukastaegert.github.io/viteconf23-rollup</a><br>
-examples: <a href="https://github.com/lukastaegert/viteconf-23-rollup-examples">github.com/lukastaegert/viteconf-23-rollup-examples</a>
+slides: <a href="https://lukastaegert.github.io/viteconf24-rollup">lukastaegert.github.io/viteconf24-rollup</a><br>
 
 </div>
