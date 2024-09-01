@@ -17,7 +17,14 @@ const props = defineProps({
 const style = computed(
   () => ({
     color: "white",
-    backgroundImage: `linear-gradient(#0005, #000a),url('${import.meta.env.BASE_URL}${props.image}')`,
+    backgroundImage: `linear-gradient(#0007, #000b),url('${import.meta.env.BASE_URL}${props.image}')`,
   })
 );
 </script>
+
+<style scoped>
+:deep(h1) {
+  font-size: 3.75rem;
+  line-height: 5rem;
+}
+</style>

@@ -12,12 +12,13 @@ import { computed } from "vue";
 
 const props = defineProps({
   image: { type: String },
+  position: { type: String, default: "center" },
 });
 
 const style = computed(
-  () =>
-    `background-image: linear-gradient(#fff5, #fff8),url('${
-      import.meta.env.BASE_URL
-    }${props.image}');`
+  () => ({
+    backgroundImage: `linear-gradient(#fff5, #fffa),url('${import.meta.env.BASE_URL}${props.image}')`,
+    backgroundPositionX: props.position,
+  })
 );
 </script>

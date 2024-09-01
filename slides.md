@@ -3,7 +3,8 @@ theme: default
 titleTemplate: '%s'
 favicon: favicon.png
 class: text-center
-background: reinventing-rollup.jpeg
+background: evolution-of-rollup.jpeg
+image: evolution-of-rollup.jpeg
 title: The Evolution of Rollup
 aspectRatio: "16/10"
 ---
@@ -13,11 +14,12 @@ aspectRatio: "16/10"
 Dr. Lukas Taegert-Atkinson<br>
 TNG Technology Consulting
 
+
 Maintainer of RollupJS
 
 ---
 layout: image
-background: past-endeavours.jpeg
+image: state-of-the-rust-migration.jpeg
 ---
 
 # State of the Rust Migration
@@ -26,7 +28,8 @@ Improvements since ViteConf 23
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: state-of-the-rust-migration.jpeg
+position: 500px
 ---
 
 ## What did we achieve so far?
@@ -45,7 +48,8 @@ image: past-endeavours.jpeg
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: state-of-the-rust-migration.jpeg
+position: 500px
 ---
 
 ## Next steps
@@ -65,14 +69,14 @@ image: past-endeavours.jpeg
 
 ---
 layout: image
-background: past-endeavours.jpeg
+image: improved-tree-shaking.jpeg
 ---
 
 # Improved Tree-Shaking
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: improved-tree-shaking.jpeg
 ---
 
 ## Function argument tracking
@@ -116,7 +120,7 @@ query('/api');
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: improved-tree-shaking.jpeg
 ---
 
 ## Function argument tracking
@@ -189,7 +193,7 @@ query('/api');
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: improved-tree-shaking.jpeg
 ---
 
 ## Tree-shaking for dynamic imports
@@ -223,7 +227,7 @@ But why stop here?
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: improved-tree-shaking.jpeg
 ---
 
 ## Tree-shaking for object properties
@@ -255,14 +259,14 @@ checkOptions(config);
 
 ---
 layout: image
-background: past-endeavours.jpeg
+image: new-syntax.jpeg
 ---
 
 # New Supported Syntax
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: new-syntax.jpeg
 ---
 
 <div style="margin-bottom: 1rem">Now supported (no transpilation):</div>
@@ -289,7 +293,7 @@ using resource = getResource();
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: new-syntax.jpeg
 ---
 
 <div style="margin-bottom: 1rem">Now supported (no transpilation):</div>
@@ -323,7 +327,7 @@ But there is something else...
 
 ---
 layout: small-image-right
-image: past-endeavours.jpeg
+image: new-syntax.jpeg
 ---
 
 ## Experimental JSX Support
@@ -385,7 +389,7 @@ export const element = <div key="foo">Hello!</div>;
 ---
 layout: image
 class: text-center
-background: reinventing-rollup.jpeg
+image: thank-you.jpeg
 ---
 
 # Thank you
